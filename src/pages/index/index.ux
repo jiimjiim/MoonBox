@@ -1,0 +1,272 @@
+<template>
+  <div class="container">
+    <div class="header" onclick="switchMode" style="background-color: {{currentModeIndex === 2 ? '#330000' : '#1a1a1a'}}">
+      <div class="header-box">
+        <div class="title-wrapper">
+          <image class="title-icon" src="/common/moon_v2.png"></image>
+          <text class="brand-title" style="color: {{currentModeIndex === 2 ? '#ff4444' : '#ff9900'}}">MoonBox
+          </text>
+        </div>
+        <div class="status-group">
+          <text class="countdown">{{countdown}}s</text>
+          <text class="status-text">{{statusMsg}}</text>
+        </div>
+      </div>
+    </div>
+    
+    <div class="scroll-wrapper">
+      <list class="coin-list">
+        <block for="{{coins}}">
+          <list-item type="coin" if="{{$item.selected}}" class="coin-row" onclick="openDetail($item)">
+            <div class="left-container">
+              <image class="coin-icon" src="{{$item.icon}}"></image>
+              <text class="name">{{$item.name}}</text>
+            </div>
+            <div class="price-container">
+              <text class="price" style="color: {{$item.change > 0 ? '#00ff00' : ($item.change < 0 ? '#ff4444' : '#ffffff')}}">{{$item.price}}</text>
+              <div class="change-box">
+                <text class="arrow" style="color: {{$item.change > 0 ? '#00ff00' : ($item.change < 0 ? '#ff4444' : '#ffffff')}}">{{$item.change > 0 ? '↑' : ($item.change < 0 ? '↓' : '')}}</text>
+                <text class="change-text" style="color: {{$item.change > 0 ? '#00ff00' : ($item.change < 0 ? '#ff4444' : '#ffffff')}}">{{$item.change}}%</text>
+              </div>
+            </div>
+          </list-item>
+        </block>
+        <list-item type="manage" class="manage-btn-row" onclick="showManageModal">
+          <image class="settings-icon" src="/common/settings.png"></image>
+        </list-item>
+      </list>
+    </div>
+
+    <div class="footer-zen" onclick="manualRefresh">
+      <text class="zen-text">盈亏同源 · 戒骄戒躁</text>
+    </div>
+
+    <div class="detail-mask" if="{{showDetail}}" onclick="closeDetail">
+      <div class="detail-card" onclick="stopProp">
+        <div class="detail-header-center">
+          <image class="detail-icon-large" src="{{activeCoin.icon}}"></image>
+          <text class="detail-name-large">{{activeCoin.name}}</text>
+        </div>
+        <div class="detail-line-item">
+          <text class="detail-label">24h 最高</text>
+          <text class="detail-val" style="color:#00ff00">{{activeCoin.high}}</text>
+        </div>
+        <div class="detail-line-item">
+          <text class="detail-label">24h 最低</text>
+          <text class="detail-val" style="color:#ff4444">{{activeCoin.low}}</text>
+        </div>
+        <div class="detail-line-item">
+          <text class="detail-label">24h 振幅</text>
+          <text class="detail-val" style="color:#ffffff">{{activeCoin.amp}}%</text>
+        </div>
+      </div>
+    </div>
+
+    <div class="manage-mask-dark" if="{{showManage}}" onclick="closeManage">
+      <div class="manage-card-clean" onclick="stopProp">
+        <text class="manage-hint">点击开关 · 长按置顶</text>
+        <div class="clean-btc-row" onclick="toggleSelect(0)" onlongpress="moveToTop(0)">
+          <text class="grid-text-large" style="color: {{coins[0].selected ? '#ff9900' : '#444444'}}">{{coins[0].name}}</text>
+        </div>
+        <div class="clean-grid-box">
+          <block for="{{coins}}">
+            <div class="clean-grid-item" if="{{$idx > 0}}" onclick="toggleSelect($idx)" onlongpress="moveToTop($idx)">
+              <text class="grid-text-small" style="color: {{$item.selected ? '#ff9900' : '#444444'}}">{{$item.name}}</text>
+            </div>
+          </block>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  .container { flex-direction: column; background-color: #000000; width: 336px; height: 480px; overflow: hidden; }
+  .header { height: 75px; width: 336px; justify-content: center; align-items: center; flex-shrink: 0; }
+  .header-box { width: 336px; height: 75px; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; }
+  .title-icon { width: 32px; height: 32px; margin-right: 8px; }
+  .brand-title { font-size: 24px; font-weight: bold; }
+  .countdown { color: #ff9900; font-size: 18px; margin-right: 12px; font-family: monospace; }
+  .status-text { color: #ffffff; font-size: 22px; }
+
+  .scroll-wrapper { flex-grow: 1; width: 336px; padding: 0 13px; }
+  .coin-list { width: 310px; flex-grow: 1; }
+  .coin-row { width: 310px; height: 91px; justify-content: space-between; align-items: center; }
+  .manage-btn-row { width: 310px; height: 80px; justify-content: center; align-items: center; }
+  .settings-icon { width: 40px; height: 40px; opacity: 0.3; }
+
+  .left-container { flex-direction: row; align-items: center; }
+  .coin-icon { width: 36px; height: 36px; margin-right: 10px; }
+  .name { color: #ffffff; font-size: 26px; font-weight: bold; }
+  .price-container { flex-direction: column; align-items: flex-end; }
+  .price { font-size: 22px; font-weight: bold; }
+  .arrow {  font-size: 18px; margin-right: 2px;font-weight: bold; }
+  .change-text { font-size: 18px; }
+  .footer-zen { width: 336px; height: 50px; justify-content: center; align-items: center; flex-shrink: 0; opacity: 0.7; }
+  .zen-text { color: #cecece; font-size: 24px; letter-spacing: 1px; }
+  .detail-mask { position: absolute; top: 0; left: 0; width: 336px; height: 480px; background-color: rgba(0,0,0,0.92); justify-content: center; align-items: center; z-index: 200; }
+  .detail-card { width: 280px; background-color: #111111; border-radius: 35px; padding: 30px; flex-direction: column; }
+  .detail-header-center { flex-direction: column; align-items: center; margin-bottom: 25px; }
+  .detail-icon-large { width: 60px; height: 60px; margin-bottom: 10px; }
+  .detail-name-large { color: #ffffff; font-size: 28px; font-weight: bold; }
+  .detail-line-item { flex-direction: row; justify-content: space-between; margin-bottom: 15px; align-items: center; }
+  .detail-label { color: #666666; font-size: 18px; }
+  .detail-val { font-size: 23px; font-weight: bold; }
+  .manage-mask-dark { position: absolute; top: 0; left: 0; width: 336px; height: 480px; background-color: rgba(0,0,0,0.93); justify-content: center; align-items: center; z-index: 300; }
+  .manage-card-clean { width: 300px; padding: 20px; flex-direction: column; align-items: center; }
+  .manage-hint { color: #b2a5a5; font-size: 24px; margin-bottom: 20px; }
+  .clean-btc-row { width: 260px; height: 60px; justify-content: center; align-items: center; margin-bottom: 15px; }
+  .clean-grid-box { width: 260px; flex-wrap: wrap; justify-content: space-between; }
+  .clean-grid-item { width: 80px; height: 55px; justify-content: center; align-items: center; margin-bottom: 10px; }
+  .grid-text-large { font-size: 28px; font-weight: bold; }
+  .grid-text-small { font-size: 22px; font-weight: bold; }
+</style>
+
+<script>
+  import fetch from '@system.fetch';
+  import brightness from '@system.brightness';
+  import vibrator from '@system.vibrator';
+  import prompt from '@system.prompt';
+  import storage from '@system.storage';
+
+  export default {
+    data: {
+      statusMsg: '--:--',
+      countdown: 60,
+      currentModeIndex: 0,
+      showDetail: false,
+      showManage: false,
+      activeCoin: {},
+      modes: [{ label: '1 min', value: 60 }, { label: '30 s', value: 30 }, { label: '15 s', value: 15 }],
+      coins: [
+        { id: 'btc_usdt', name: 'BTC', selected: true, price: '---', change: 0, icon: '/common/btc.png' },
+        { id: 'eth_usdt', name: 'ETH', selected: true, price: '---', change: 0, icon: '/common/eth.png' },
+        { id: 'bnb_usdt', name: 'BNB', selected: true, price: '---', change: 0, icon: '/common/bnb.png' },
+        { id: 'sol_usdt', name: 'SOL', selected: true, price: '---', change: 0, icon: '/common/sol.png' },
+        { id: 'xrp_usdt', name: 'XRP', selected: true, price: '---', change: 0, icon: '/common/xrp.png' },
+        { id: 'doge_usdt', name: 'DOGE', selected: true, price: '---', change: 0, icon: '/common/doge.png' },
+        //默认显示前六，从孙割的币开始不显示^_^
+        { id: 'trx_usdt', name: 'TRX', selected: false, price: '---', change: 0, icon: '/common/trx.png' },
+        { id: 'ton_usdt', name: 'TON', selected: false, price: '---', change: 0, icon: '/common/ton.png' },
+        { id: 'ada_usdt', name: 'ADA', selected: false, price: '---', change: 0, icon: '/common/ada.png' },
+        { id: 'avax_usdt', name: 'AVAX', selected: false, price: '---', change: 0, icon: '/common/avax.png' }
+      ],
+      timer: null
+    },
+    onInit() {
+      this.loadConfig();
+      this.startMasterTimer();
+    },
+    loadConfig() {
+      storage.get({
+        key: 'moonbox_v10_final',
+        success: (data) => {
+          if (data) {
+            const saved = JSON.parse(data);
+            let merged = [];
+            saved.forEach(s => {
+              let match = this.coins.find(c => c.id === s.id);
+              if (match) { match.selected = s.selected; merged.push(match); }
+            });
+            this.coins.forEach(c => { if (!merged.find(m => m.id === c.id)) merged.push(c); });
+            this.coins = merged;
+          }
+          this.refreshAll();
+        }
+      });
+    },
+    saveConfig() {
+      const simplified = this.coins.map(c => ({ id: c.id, selected: c.selected }));
+      storage.set({ key: 'moonbox_v10_final', value: JSON.stringify(simplified) });
+    },
+    toggleSelect(idx) {
+      this.coins[idx].selected = !this.coins[idx].selected;
+      this.coins.splice(idx, 1, this.coins[idx]);
+      this.saveConfig();
+      vibrator.vibrate({ mode: 'short' });
+    },
+    moveToTop(idx) {
+      if (idx === 0) return;
+      const item = this.coins.splice(idx, 1)[0];
+      this.coins.unshift(item);
+      this.saveConfig();
+      vibrator.vibrate({ mode: 'long' });
+      prompt.showToast({ message: '已置顶' });
+    },
+    showManageModal() { this.showManage = true; vibrator.vibrate({ mode: 'short' }); },
+    closeManage() { this.showManage = false; this.refreshAll(); },
+    switchMode() {
+      this.currentModeIndex = (this.currentModeIndex + 1) % this.modes.length;
+      this.countdown = this.modes[this.currentModeIndex].value;
+      vibrator.vibrate({ mode: (this.currentModeIndex === 2 ? 'long' : 'short') });
+      if (this.currentModeIndex === 2) {
+        brightness.setKeepScreenOn({ keepScreenOn: true });
+        prompt.showToast({ message: '疯狂模式！屏幕常亮！', duration: 1 });
+      } else {
+        brightness.setKeepScreenOn({ keepScreenOn: false });
+      }
+    },
+    openDetail(item) { this.activeCoin = item; this.showDetail = true; vibrator.vibrate({ mode: 'short' }); },
+    closeDetail() { this.showDetail = false; },
+    stopProp(e) { if (e && e.stopPropagation) e.stopPropagation(); },
+    startMasterTimer() {
+      this.timer = setInterval(() => {
+        const now = new Date();
+        const h = now.getHours();
+        const m = now.getMinutes();
+        this.statusMsg = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m);
+        if (this.countdown > 0) this.countdown--;
+        else { 
+          this.refreshAll(); 
+          this.countdown = this.modes[this.currentModeIndex].value; 
+        }
+      }, 1000);
+    },
+    manualRefresh() {
+      vibrator.vibrate({ mode: 'short' });
+      this.refreshAll();
+      this.countdown = this.modes[this.currentModeIndex].value;
+    },
+    refreshAll() {
+      let selectedCoins = [];
+      this.coins.forEach((c, i) => {
+        if(c.selected) selectedCoins.push({ id: c.id, index: i });
+      });
+      selectedCoins.forEach((item, i) => {
+        setTimeout(() => {
+          this.getSinglePrice(item.id, item.index);
+        }, i * 150); 
+      });
+    },
+
+    getSinglePrice(instId, index) {
+      fetch.fetch({
+        url: 'https://data.gateapi.io/api2/1/ticker/' + instId,
+        success: (response) => {
+          try {
+            let res = (typeof response.data === 'object') ? response.data : JSON.parse(response.data);
+            if (res.last) {
+              let item = this.coins[index];
+              let last = parseFloat(res.last);
+              let h_raw = parseFloat(res.high24hr || 0);
+              let l_raw = parseFloat(res.low24hr || 0);
+
+              let p = 2;
+              const name = item.name.toUpperCase();
+              if (["TON", "XRP", "AVAX"].includes(name)) { p = 3; } 
+              else if (["DOGE", "TRX", "ADA"].includes(name)) { p = 4; }
+
+              item.price = "$" + last.toFixed(p);
+              item.high = h_raw.toFixed(p);
+              item.low = l_raw.toFixed(p);
+              item.change = parseFloat(res.percentChange || 0).toFixed(2);
+              item.amp = l_raw > 0 ? ((h_raw - l_raw) / l_raw * 100).toFixed(2) : "0.00";
+              
+              this.coins.splice(index, 1, item);
+            }
+          } catch (e) { }
+        }
+      });
+    }
+  }
+</script>

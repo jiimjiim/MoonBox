@@ -1,0 +1,33 @@
+{
+  "package": "com.jiim.moonbox",
+  "name": "MoonBox",
+  "versionName": "1.2.1",
+  "versionCode": 15,
+  "minPlatformVersion": 1060,
+  "icon": "/common/logo.png",
+  "deviceTypeList": ["watch"],
+  "features": [
+    { "name": "system.fetch" },
+    { "name": "system.network" },
+    { "name": "system.brightness" },
+    { "name": "system.prompt" },
+    { "name": "system.storage" },
+    { "name": "system.router" },
+    { "name": "system.vibrator" }
+  ],
+  "config": {
+    "logLevel": "log",
+    "designWidth": "device-width",
+    "network": {
+      "no_check_domain": true
+    }
+  },
+  "router": {
+    "entry": "pages/index",
+    "pages": {
+      "pages/index": {
+        "component": "index"
+      }
+    }
+  }
+}
