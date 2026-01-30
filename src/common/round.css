@@ -1,0 +1,127 @@
+/* round.css */
+
+/* 1. 容器：圆屏必须强制内容居中 */
+.container-round {
+  position: relative;
+  flex-direction: column;
+  background-color: #000000;
+  width: 100%;
+  height: 100%;
+  align-items: center; 
+}
+
+/* 核心修复：增加高度确保填满顶部 */
+.header-click-area-round {
+  width: 100%;
+  height: 80px; /* 与 header-unit-round 保持一致 */
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: #1a1a1a; /* 确保背景色统一 */
+}
+
+/* 列表区域相应上移 */
+.scroll-wrapper-round {
+  flex-grow: 1;
+  width: 100%;
+  padding: 0 45px;
+  margin-top: 5px; /* 减小间隙 */
+}
+
+.coin-list-round {
+  width: 100%;
+  flex-grow: 1;
+}
+
+/* 4. 列表项：去除了边框，视觉更通透 */
+.coin-row-round {
+  width: 100%;
+  height: 110px; 
+  justify-content: space-between;
+  align-items: center;
+  /* 核心修改：彻底消除边框 */
+  border: none;
+  border-bottom: 0px solid transparent;
+  outline: none;
+}
+
+.coin-icon-round {
+  width: 55px; 
+  height: 55px;
+  margin-right: 12px;
+}
+
+.name-round {
+  color: #ffffff;
+  font-size: 34px;
+  font-weight: bold;
+}
+
+/* 5. 价格与涨幅：垂直分行，靠右对齐 */
+.price-container-round {
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.price-round {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.change-box-round {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.arrow-round {
+  font-size: 22px;
+  margin-right: 4px;
+}
+
+.change-text-round {
+  font-size: 22px;
+}
+
+/* 6. 管理按钮：增加间距 */
+.manage-btn-row-round {
+  width: 100%;
+  height: 120px;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.settings-icon-round {
+  width: 48px;
+  height: 48px;
+  opacity: 0.4;
+}
+
+/* 7. 底栏：避开圆底 */
+.footer-zen-round {
+  width: 100%;
+  height: 65px;
+  padding-bottom: 15px; /* 给圆屏底部留出安全距离 */
+  justify-content: center;
+  align-items: center;
+  opacity: 0.6;
+}
+
+.zen-text-round {
+  color: #cecece;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+
+/* 8. 弹窗容器（全屏覆盖） */
+.modal-wrapper-round {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  background-color: #000000;
+}

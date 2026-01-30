@@ -1,0 +1,164 @@
+<import name="header-bar" src="../../components/header-bar.ux"></import>
+<import name="detail-modal" src="../../components/detail-modal.ux"></import>
+<import name="manage-modal" src="../../components/manage-modal.ux"></import>
+
+<template>
+  <div class="container">
+    <div class="header-click-area" onclick="switchMode">
+      <header-bar mode-index="{{currentModeIndex}}" countdown="{{countdown}}"></header-bar>
+    </div>
+
+    <div class="scroll-wrapper">
+      <list class="coin-list">
+        <block for="{{coins}}">
+          <list-item type="coin" if="{{$item.selected}}" class="coin-row" onclick="openDetail($item)">
+            <div class="info-header">
+              <image class="coin-icon" src="{{$item.icon}}"></image>
+              <text class="name">{{$item.name}}</text>
+            </div>
+            <text class="price" style="color: {{$item.change > 0 ? '#00ff00' : ($item.change < 0 ? '#ff4444' : '#ffffff')}}">{{$item.price}}</text>
+            <div class="change-box">
+              <text class="arrow" style="color: {{$item.change > 0 ? '#00ff00' : ($item.change < 0 ? '#ff4444' : '#ffffff')}}">{{$item.change > 0 ? '↑' : ($item.change < 0 ? '↓' : '')}}</text>
+              <text class="change-text" style="color: {{$item.change > 0 ? '#00ff00' : ($item.change < 0 ? '#ff4444' : '#ffffff')}}">{{$item.change}}%</text>
+            </div>
+          </list-item>
+        </block>
+        
+        <list-item type="manage" class="manage-btn-row" onclick="showManageModal">
+          <image class="settings-icon" src="/common/settings.png"></image>
+        </list-item>
+      </list>
+    </div>
+
+    <div class="footer-zen" onclick="manualRefresh">
+      <div class="footer-content">
+        <text class="countdown-text" style="color: #ff9900">{{countdown}}s</text>
+        <text class="footer-split">|</text>
+        <text class="zen-text">{{statusMsg}}</text>
+      </div>
+    </div>
+
+    <div class="modal-wrapper" if="{{showDetail}}">
+      <detail-modal 
+        coin="{{activeCoin}}" 
+        onclose="closeDetail">
+      </detail-modal>
+    </div>
+
+    <div class="modal-wrapper" if="{{showManage}}"> 
+      <manage-modal 
+        coins="{{coins}}" 
+        onclosecallback="closeManage">
+      </manage-modal>
+    </div>
+
+  </div> </template>
+
+<style>@import '../../common/market.css';</style>
+
+<script>
+import brightness from '@system.brightness';
+import vibrator from '@system.vibrator';
+import prompt from '@system.prompt';
+import apiService from '../../common/api.js';
+import configManager from '../../common/config.js';
+// 导入常量
+import { DEFAULT_COINS, APP_MODES } from '../../common/constants.js';
+
+export default {
+  data: {
+    statusMsg: '--:--',
+    countdown: 60,
+    currentModeIndex: 0,
+    showDetail: false,
+    showManage: false,
+    activeCoin: {},
+    modes: APP_MODES,
+    coins: DEFAULT_COINS,
+    timer: null
+  },
+
+  onInit() {
+    this.loadConfig();
+    this.startMasterTimer();
+  },
+
+  loadConfig() {
+    configManager.load(this.coins, (merged) => {
+      this.coins = merged;
+      this.refreshAll();
+    });
+  },
+
+  saveConfig() {
+    configManager.save(this.coins);
+  },
+
+  showManageModal() {
+    vibrator.vibrate({ mode: 'short' });
+    this.showManage = true;
+  },
+
+  closeManage(evt) { // 这里的参数是事件对象
+  this.showManage = false;
+  // 关键：从 evt.detail 中提取数据
+  const updatedCoins = evt.detail.updatedCoins; 
+  
+  if (updatedCoins && Array.isArray(updatedCoins)) { 
+    this.coins = updatedCoins; 
+    this.saveConfig();
+    vibrator.vibrate({ mode: 'long' });
+  }
+  setTimeout(() => {
+    this.countdown = this.modes[this.currentModeIndex].value;
+    this.refreshAll();
+  }, 800);
+},
+  openDetail(item) {
+    this.activeCoin = item;
+    this.showDetail = true;
+    vibrator.vibrate({ mode: 'short' });
+  },
+
+  closeDetail() { this.showDetail = false; },
+
+  switchMode() {
+    this.currentModeIndex = (this.currentModeIndex + 1) % this.modes.length;
+    this.countdown = this.modes[this.currentModeIndex].value;
+    vibrator.vibrate({ mode: (this.currentModeIndex === 2 ? 'long' : 'short') });
+    brightness.setKeepScreenOn({ keepScreenOn: (this.currentModeIndex === 2) });
+    if (this.currentModeIndex === 2) prompt.showToast({ message: '疯狂模式！屏幕常亮！' });
+  },
+
+  manualRefresh() {
+    vibrator.vibrate({ mode: 'short' });
+    this.refreshAll();
+    this.countdown = this.modes[this.currentModeIndex].value;
+  },
+
+  startMasterTimer() {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = setInterval(() => {
+      const now = new Date();
+      this.statusMsg = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      if (this.showManage || this.showDetail) return;
+      if (this.countdown > 0) {
+        this.countdown--;
+      } else {
+        this.refreshAll();
+        this.countdown = this.modes[this.currentModeIndex].value;
+      }
+    }, 1000);
+  },
+
+  refreshAll() {
+    if (this.showManage) return;
+    apiService.updateAll(this.coins, (updatedItem) => {
+      const idx = this.coins.findIndex(c => c.id === updatedItem.id);
+      if (idx !== -1 && this.coins[idx].price !== updatedItem.price) {
+        this.coins.splice(idx, 1, updatedItem);
+      }
+    });
+  }
+}
+</script>

@@ -1,0 +1,30 @@
+/* pro.css */
+.container-pro { position: relative; flex-direction: column; background-color: #000000; width: 100%; height: 100%; overflow: hidden; }
+.header-click-area-pro { width: 100%; height: 75px; flex-shrink: 0; }
+.scroll-wrapper-pro { flex-grow: 1; width: 100%; padding: 0 13px; }
+.coin-list-pro { width: 310px; flex-grow: 1; }
+.coin-row-pro { width: 100%; height: 91px; justify-content: space-between; align-items: center; }
+.coin-icon-pro { width: 36px; height: 36px; margin-right: 10px; }
+.name-pro { color: #ffffff; font-size: 26px; font-weight: bold; }
+
+/* 核心修复：添加 -pro 后缀并确保纵向排列 */
+.price-container-pro { 
+  flex-direction: column; 
+  align-items: flex-end; 
+  justify-content: center; 
+}
+.price-pro { font-size: 22px; font-weight: bold; }
+
+/* 核心修复：添加 -pro 后缀并确保横向排列 */
+.change-box-pro { 
+  flex-direction: row; 
+  align-items: center; 
+}
+.arrow-pro { font-size: 18px; margin-right: 2px; font-weight: bold; }
+.change-text-pro { font-size: 18px; }
+
+.manage-btn-row-pro { width: 310px; height: 80px; justify-content: center; align-items: center; }
+.settings-icon-pro { width: 40px; height: 40px; opacity: 0.3; }
+.footer-zen-pro { width: 336px; height: 50px; justify-content: center; align-items: center; flex-shrink: 0; opacity: 0.7; }
+.zen-text-pro { color: #cecece; font-size: 24px; letter-spacing: 2px; }
+.modal-wrapper-pro { position: absolute; top: 0; left: 0; width: 336px; height: 480px; z-index: 10000; background-color: #000000; }

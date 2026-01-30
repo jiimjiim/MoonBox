@@ -1,0 +1,64 @@
+<template>
+  <div class="header-unit-{{deviceMode}}" style="background-color: {{modeIndex === 2 ? '#330000' : '#1a1a1a'}}">
+    <div class="header-box-{{deviceMode}}">
+      <div class="brand-row">
+        <image class="title-icon" src="/common/moon_v2.png"></image>
+        <text class="brand-title" style="color: {{modeIndex === 2 ? '#ff4444' : '#ff9900'}}">MoonBox</text>
+      </div>
+      
+      <div class="status-row-{{deviceMode}}">
+        <text class="countdown">{{countdown}}s</text>
+        <text class="status-text">{{time}}</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  /* --- 方屏保持原样 (单行) --- */
+  .header-unit-pro { height: 75px; width: 100%; justify-content: center; align-items: center;padding-top: 10px; }
+  .header-box-pro { width: 100%; height: 75px; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; }
+  .status-row-pro { flex-direction: row; align-items: center; }
+
+  /* --- 圆屏重构 (双行) --- */
+  .header-unit-round { 
+    height: 80px; /* 稍微减小总高度，不再显得那么“宽” */
+    width: 100%; 
+    justify-content: center; 
+    align-items: center; 
+    padding-top: 20px; /* 避开圆周顶部，但背景依然填满 */
+  }
+  .header-box-round { 
+    width: 100%; 
+    flex-direction: column; /* 改为纵向排列 */
+    justify-content: center;
+    align-items: center; 
+    padding: 0 40px; 
+  }
+
+  .brand-row { flex-direction: row; align-items: center; margin-bottom: 4px; }
+  
+  .status-row-round { 
+    flex-direction: row; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%;
+  }
+
+  /* 通用微调 */
+  .title-icon { width: 28px; height: 28px; margin-right: 6px; }
+  .brand-title { font-size: 22px; font-weight: bold; }
+  .countdown { color: #ff9900; font-size: 16px; margin-right: 15px; font-family: monospace; }
+  .status-text { color: #ffffff; font-size: 18px; opacity: 0.9; }
+</style>
+
+<script>
+  export default {
+    props: {
+      modeIndex: {},
+      countdown: {},
+      time: {},
+      deviceMode: { default: 'pro' }
+    }
+  }
+</script>

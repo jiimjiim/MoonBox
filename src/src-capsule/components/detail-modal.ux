@@ -1,0 +1,128 @@
+<template>
+  <div class="fixed-full-page" onclick="handleBack">
+    <div class="safe-top"></div>
+
+    <div class="main-body">
+      <image class="large-logo" src="{{coin.icon}}"></image>
+      <text class="large-name">{{coin.name}}</text>
+      
+      <div class="spacing-div"></div>
+
+      <div class="info-table">
+        <div class="item-block">
+          <text class="item-label">24H最高</text>
+          <text class="item-value text-up">{{coin.high}}</text>
+        </div>
+
+        <div class="item-block">
+          <text class="item-label">24H最低</text>
+          <text class="item-value text-down">{{coin.low}}</text>
+        </div>
+
+        <div class="item-block">
+          <text class="item-label">振幅</text>
+          <text class="item-value">{{coin.amp}}%</text>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-hint-area">
+      <text class="back-tip">点击屏幕返回</text>
+    </div>
+  </div>
+</template>
+
+<style>
+  .fixed-full-page {
+    width: 100%; height: 100%;
+    background-color: #000000;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .safe-top { height: 30px; } /* 进一步缩减顶部安全区高度 */
+
+  .main-body {
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    padding: 0 10px; /* 进一步缩减内边距 */
+  }
+
+  .large-logo { 
+    width: 70px; height: 70px; /* Logo 再稍微缩小一点 */
+    object-fit: contain;
+  }
+
+  .large-name { 
+    color: #ffffff; font-size: 30px; font-weight: bold; /* 名称也稍微缩小 */
+    margin-top: 8px;
+  }
+  
+  .spacing-div { height: 40px; } /* 缩小间隔 */
+
+  .info-table { 
+    flex-direction: column; 
+    width: 100%; 
+    padding: 0 5px; /* 表格内边距进一步缩减 */
+  }
+
+  /* 每个数据块（标签+数值） */
+  .item-block { /* 注意：这里是 item-block，不再是 item-row */
+    flex-direction: column; /* 核心修改：改为纵向排列 */
+    justify-content: center;
+    align-items: center; /* 标签和数值都居中 */
+    height: 85px; /* 适当增加每个数据块的高度 */
+    width: 100%;
+    margin-bottom: 7px; /* 每个数据块之间留一点间距 */
+  }
+
+  .item-label { 
+    color: #888888; 
+    font-size: 24px; /* 标签字号更小 */
+    margin-bottom: 4px; /* 标签和数值之间的间距 */
+  }
+
+  .item-value { 
+    color: #ffffff; 
+    font-size: 30px; /* 数值保持较大，突出显示 */
+    font-weight: bold; 
+  }
+
+  .text-up { color: #00ff00; }
+  .text-down { color: #ff4444; }
+
+  .bottom-hint-area { 
+    width: 100%;
+    height: 70px; /* 底部提示区高度稍微压缩 */
+    justify-content: center; 
+    align-items: center;
+    padding-bottom: 30px;
+  }
+
+  .back-tip { 
+    color: #9b9b9b; 
+    font-size: 22px; /* 提示文字也缩小 */
+  }
+</style>
+
+<script>
+import vibrator from '@system.vibrator';
+
+export default {
+  props: ['coin'], // 只接收数据
+  handleBack() {
+    // 1. 震动反馈
+    try {
+      vibrator.vibrate({ mode: 'short' });
+    } catch (e) {}
+
+    // 2. 核心：通过事件向上派发，而不是调用 prop 函数
+    // 派发一个名为 'close' 的事件
+    this.$emit('close'); 
+  }
+}
+</script>

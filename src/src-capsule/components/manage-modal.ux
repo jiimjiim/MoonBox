@@ -1,0 +1,126 @@
+<template>
+  <div class="manage-mask-dark">
+    <div class="header-area">
+      <text class="manage-hint">点击开关</text>
+      <text class="manage-hint">长按置顶</text>
+    </div>
+
+    <div class="main-body">
+      <div class="clean-grid-box">
+        <block for="{{coins}}">
+          <div class="clean-grid-item {{ $idx === 0 ? 'top-border' : 'no-border' }}" 
+               onclick="toggleSelect($idx)" 
+               onlongpress="moveToTop($idx)">
+            <text class="grid-text" style="color: {{$item.selected ? '#ff9900' : '#444444'}}">{{$item.name}}</text>
+          </div>
+        </block>
+      </div>
+    </div>
+
+    <div class="manage-footer-bar" onclick="handleBack">
+      <text class="footer-title">保存</text>
+    </div>
+  </div>
+</template>
+
+<style>
+  .manage-mask-dark {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: #000000;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .header-area {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px; /* 增加顶部安全距离 */
+    margin-bottom: 15px;
+  }
+  
+  .manage-hint { 
+    color: #555555; 
+    font-size: 20px; 
+    line-height: 30px; /* 增加行高防止文字粘连 */
+  }
+
+  .main-body {
+    flex-grow: 1;
+    width: 100%;
+    padding: 0 25px; /* 左右留白，让列表更聚拢 */
+  }
+
+  .clean-grid-box { 
+    width: 100%; 
+    flex-wrap: wrap; 
+    justify-content: space-between; 
+  }
+
+  .clean-grid-item { 
+    width: 78px;  /* 缩小宽度 */
+    height: 58px; /* 缩小高度，确保 5 行能一屏放下 */
+    justify-content: center; 
+    align-items: center; 
+    margin-bottom: 6px; /* 紧凑间距 */
+    border-radius: 6px;
+  }
+
+  /* 仅置顶项显示边框 */
+  .top-border {
+    border: 2px solid #ff9900;
+  }
+
+  /* 其他项隐藏边框 */
+  .no-border {
+    border: 0px;
+  }
+
+  .grid-text { 
+    font-size: 24px; /* 字号微调，视觉更精致 */
+    font-weight: bold; 
+  }
+
+  .manage-footer-bar {
+    width: 100%;
+    height: 90px;
+    padding-bottom: 15px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .footer-title {
+    color: #ff9900;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+</style>
+
+<script>
+  import vibrator from '@system.vibrator';
+
+  export default {
+    props: ['coins'], // 移除 closecallback prop，改用 emit
+
+    toggleSelect(idx) {
+      vibrator.vibrate({ mode: 'short' });
+      this.coins[idx].selected = !this.coins[idx].selected;
+      this.coins.splice(idx, 1, this.coins[idx]);
+    },
+
+    moveToTop(idx) {
+      if (idx === 0) return;
+      vibrator.vibrate({ mode: 'long' });
+      const item = this.coins.splice(idx, 1)[0];
+      this.coins.unshift(item);
+    },
+
+    handleBack() {
+      vibrator.vibrate({ mode: 'short' });
+      // 通过事件通知父组件关闭并传回更新后的列表
+      this.$emit('closecallback', { updatedCoins: this.coins });
+    }
+  }
+</script>

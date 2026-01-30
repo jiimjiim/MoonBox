@@ -1,0 +1,118 @@
+<template>
+  <div class="fixed-full-page" onclick="handleBack">
+    <div class="safe-top"></div>
+
+    <div class="main-body">
+      <image class="large-logo" src="{{coin.icon}}"></image>
+      
+      <text class="large-name">{{coin.name}}</text>
+      
+      <div class="spacing-div"></div>
+
+      <div class="info-table">
+        <div class="item-row">
+          <text class="item-label">24h最高</text>
+          <text class="item-value text-up">{{coin.high}}</text>
+        </div>
+
+        <div class="item-row">
+          <text class="item-label">24h最低</text>
+          <text class="item-value text-down">{{coin.low}}</text>
+        </div>
+
+        <div class="item-row">
+          <text class="item-label">24h振幅</text>
+          <text class="item-value">{{coin.amp}}%</text>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-hint-area">
+      <text class="back-tip">点击屏幕返回</text>
+    </div>
+  </div>
+</template>
+
+<style>
+  /* 基础容器：样式完全维持原版 */
+  .fixed-full-page {
+    width: 100%; height: 100%; /* 使用具体宽度 336px 减少引擎计算全屏宽度的开销 */
+    background-color: #000000;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .safe-top { height: 50px; }
+
+  .main-body {
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    width: 336px;
+    padding: 0 30px;
+  }
+
+  /* 优化：去掉外层 logo-area 容器，直接样式赋给图片，减少 DOM 节点 */
+  .large-logo { 
+    width: 100px; height: 100px; 
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .large-name { 
+    color: #ffffff; font-size: 38px; font-weight: bold; 
+    margin-top: 15px;
+    flex-shrink: 0;
+  }
+  
+  .spacing-div { height: 40px; }
+
+  .info-table { flex-direction: column; width: 100%; }
+
+  .item-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    width: 100%;
+  }
+
+  /* 维持 26px */
+  .item-label { color: #aaaaaa; font-size: 26px; }
+
+  /* 维持 30px 粗体 */
+  .item-value { color: #ffffff; font-size: 30px; font-weight: bold; }
+
+  .text-up { color: #00ff00; }
+  .text-down { color: #ff4444; }
+
+  .bottom-hint-area { 
+    width: 100%;
+    height: 100px;
+    justify-content: center; 
+    align-items: center;
+  }
+
+  /* 维持 24px */
+  .back-tip { 
+    color: #666666; 
+    font-size: 24px; 
+  }
+</style>
+
+<script>
+  import vibrator from '@system.vibrator';
+
+  export default {
+    props: ['coin', 'closecallback'],
+    handleBack() {
+      // 震动反馈是性能感官的一部分，保留
+      vibrator.vibrate({ mode: 'short' });
+      if (this.closecallback) {
+        this.closecallback();
+      }
+    }
+  }
+</script>

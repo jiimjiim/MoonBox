@@ -1,0 +1,60 @@
+<template>
+  <div class="header-unit" style="background-color: {{getBgColor()}}">
+    <div class="header-box">
+      <div class="title-wrapper">
+        <image class="title-icon" src="/common/moon_v2.png"></image>
+        <text class="brand-title" style="color: {{getTextColor()}}">MoonBox</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  .header-unit { 
+    height: 60px; /* 进一步压缩高度，增加紧凑感 */
+    width: 100%; 
+    justify-content: center; 
+    align-items: center; 
+    flex-shrink: 0; 
+  }
+  
+  .header-box { 
+    width: 100%; 
+    height: 60px; 
+    flex-direction: row; 
+    justify-content: center; /* 居中品牌信息 */
+    align-items: center; 
+    padding-top: 16px; /* 视觉下移，避开顶部边缘 */
+  }
+
+  .title-wrapper { flex-direction: row; align-items: center; }
+  
+  .title-icon { 
+    width: 22px; height: 22px; /* 缩小 Logo，更精致 */
+    margin-right: 6px; 
+    opacity: 0.9;
+  }
+  
+  .brand-title { 
+    font-size: 20px; 
+    font-weight: bold; 
+    letter-spacing: 1px;
+  }
+</style>
+
+<script>
+  export default {
+    props: ['modeIndex'],
+    // 背景色：普通-全黑/深灰, 极速-暗绿, 疯狂-暗红
+    getBgColor() {
+      // 使用更纯正的语义化背景
+      const bgColors = ['#000000', '#002200', '#220000']; 
+      return bgColors[this.modeIndex] || '#000000';
+    },
+    // 文字颜色微调：普通模式用橙色点缀，其他模式用亮色对比
+    getTextColor() {
+      const textColors = ['#ff9900', '#00ff00', '#ff4444'];
+      return textColors[this.modeIndex] || '#ff9900';
+    }
+  }
+</script>
