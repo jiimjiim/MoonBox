@@ -1,121 +1,118 @@
 <template>
-    <div class="picker-container">
-      <div class="top-spacer"></div>
-  
-      <div class="content-box">
-        <text class="picker-title">选择显示布局</text>
-  
-        <div class="picker-options">
-          <div 
-            class="btn-box {{btnWidthClass}} {{pendingMode === 'pro' ? 'btn-confirmed' : ''}}" 
-            onclick="handleTap('pro')">
-            <text class="btn-text">{{pendingMode === 'pro' ? '再次点击确认' : '方屏\n(手环Pro/红米Watch)'}}</text>
-          </div>
-  
-          <div 
-            class="btn-box {{btnWidthClass}} {{pendingMode === 'round' ? 'btn-confirmed' : ''}}" 
-            onclick="handleTap('round')">
-            <text class="btn-text">{{pendingMode === 'round' ? '再次点击确认' : '圆屏\n(小米Watch)'}}</text>
-          </div>
+  <div class="picker-container">
+    <div class="top-spacer"></div>
+
+    <div class="content-box">
+      <text class="picker-title">选择显示布局</text>
+
+      <div class="picker-options">
+        <div 
+          class="btn-box {{btnWidthClass}}" 
+          onclick="handleTap('pro')">
+          <text class="btn-text">{{proText}}</text>
         </div>
-  
-        <text class="picker-hint">主页长按顶栏可重选</text>
+
+        <div 
+          class="btn-box {{btnWidthClass}}" 
+          onclick="handleTap('round')">
+          <text class="btn-text">{{roundText}}</text>
+        </div>
       </div>
+
+      <text class="picker-hint">主页长按顶栏可重选</text>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    props: ['deviceMode'], 
-    data: {
-      pendingMode: ''
-    },
-    computed: {
-      btnWidthClass() {
-        if (this.deviceMode === 'capsule') {
-          return 'btn-capsule';
-        } else if (this.deviceMode === 'round') {
-          return 'btn-round';
-        } else {
-          return 'btn-pro';
-        }
-      }
-    },
-    handleTap(mode) {
-      if (this.pendingMode === mode) {
-        this.$emit('select', { mode: mode });
+  </div>
+</template>
+
+<script>
+import vibrator from '@system.vibrator';
+
+export default {
+  props: ['deviceMode'],
+  data: {
+    // 将包含换行符的文字放在 data 里，强制编译器按字符串处理
+    proText: "方屏\n(手环Pro/红米Watch)",
+    roundText: "圆屏\n(小米Watch)"
+  },
+  computed: {
+    btnWidthClass() {
+      if (this.deviceMode === 'capsule') {
+        return 'btn-capsule';
+      } else if (this.deviceMode === 'round') {
+        return 'btn-round';
       } else {
-        this.pendingMode = mode;
+        return 'btn-pro';
       }
     }
+  },
+  handleTap(mode) {
+    vibrator.vibrate({ mode: 'short' });
+    this.$emit('select', { mode: mode });
   }
-  </script>
-  
-  <style>
-    .picker-container {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #000000;
-      flex-direction: column;
-      align-items: center;
-      z-index: 99999;
-    }
-  
-    .top-spacer { height: 15%; }
-  
-    .content-box {
-      width: 100%;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 20px;
-    }
-  
-    .picker-title {
-      color: #ffffff;
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 40px;
-      text-align: center;
-    }
-  
-    .picker-options {
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    }
-  
-    .btn-box {
-      height: 85px;
-      background-color: #1a1a1a;
-      border: 2px solid #333333;
-      border-radius: 42px;
-      margin: 10px 0;
-      justify-content: center;
-      align-items: center;
-    }
-  
-    /* 移除了导致报错的 :active 伪类 */
-  
-    .btn-pro { width: 260px; }
-    .btn-round { width: 220px; }
-    .btn-capsule { width: 160px; }
-  
-    .btn-confirmed {
-      border-color: #00ff00;
-      background-color: #0a220a;
-    }
-  
-    .btn-text {
-      color: #ffffff;
-      font-size: 24px;
-      text-align: center;
-    }
-  
-    .picker-hint {
-      color: #666666;
-      font-size: 18px;
-      margin-top: 30px;
-      text-align: center;
-      line-height: 24px;
-    }
-  </style>
+}
+</script>
+
+<style>
+  .picker-container {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #000000;
+    flex-direction: column;
+    align-items: center;
+    z-index: 99999;
+  }
+
+  .top-spacer { height: 15%; }
+
+  .content-box {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
+  }
+
+  .picker-title {
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .picker-options {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .btn-box {
+    height: 85px;
+    background-color: #1a1a1a;
+    border: 2px solid #333333;
+    border-radius: 42px;
+    margin: 10px 0;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .btn-pro { width: 260px; }
+  .btn-round { width: 220px; }
+  .btn-capsule { width: 160px; }
+
+  .btn-text {
+    color: #ffffff;
+    font-size: 24px;
+    text-align: center;
+    /* 确保文本能够换行显示 */
+    lines: 2; 
+    text-overflow: ellipsis;
+  }
+
+  .picker-hint {
+    color: #666666;
+    font-size: 18px;
+    margin-top: 30px;
+    text-align: center;
+    line-height: 24px;
+  }
+</style>

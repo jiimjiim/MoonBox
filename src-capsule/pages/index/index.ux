@@ -127,7 +127,7 @@ export default {
     this.countdown = this.modes[this.currentModeIndex].value;
     vibrator.vibrate({ mode: (this.currentModeIndex === 2 ? 'long' : 'short') });
     brightness.setKeepScreenOn({ keepScreenOn: (this.currentModeIndex === 2) });
-    if (this.currentModeIndex === 2) prompt.showToast({ message: '疯狂模式！屏幕常亮！' });
+    if (this.currentModeIndex === 2) prompt.showToast({ message: '常亮模式！' });
   },
 
   manualRefresh() {
